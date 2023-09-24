@@ -6,26 +6,33 @@
     /// </summary>
     class FindEqualSumStrings
     {
-        private string sample;
-        private ProcessEqual? process = null;
-        private char maxNumber;
-        private char[] arrEqual;
+        private string _sample;
+        private ProcessEqual? _process = null;
+        private char _maxNumber;
+        private char _minNumber;
+        private char[] _arrArrange;
+        private char[] _arrEqual;
 
         public delegate bool ProcessEqual(char[] arr);
 
-        public FindEqualSumStrings(string sample, char maxNumber = char.MaxValue)
+        public FindEqualSumStrings(string sample, char maxNumber = char.MaxValue, char minNumber = (char)0)
         {
-            this.sample = sample;
-            arrEqual = new char[sample.Length];
-            this.maxNumber = maxNumber;
+            this._sample = sample;
+            _arrArrange = new char[sample.Length];
+            _arrEqual = new char[sample.Length];
+            this._maxNumber = maxNumber + 1 > char.MaxValue ? char.MaxValue : (char)(maxNumber + 1);
+            this._minNumber = minNumber;
         }
 
         public bool Start(ProcessEqual process)
         {
-            this.process = process;
+            if (_sample.Where(b => b - _minNumber < 0).Any())
+                return false;
 
-            long sum = sample.Sum(b => b);
-            bool ret = Arrange(0, maxNumber, sum);
+            this._process = process;
+
+            long sum = _sample.Sum(b => b) - _minNumber * _sample.Length;
+            bool ret = Arrange(0, (char)(_maxNumber - _minNumber), sum);
             Shift(0);
 
             return ret;
@@ -33,33 +40,38 @@
 
         private void Shift(int row)
         {
-            if (arrEqual[row] < 2 || row >= arrEqual.Length - 1)
-            {
+            if (_arrArrange[row] < 2 || row >= _arrArrange.Length - 1)
                 return;
-            }
 
             int backWard = 0;
+            long sum;
 
             do
             {
-                if ((backWard > 0 && arrEqual[row] > arrEqual[row + 1]) ||
-                    arrEqual[row + 1] == 0)
+                if ((backWard > 0 && _arrArrange[row] > _arrArrange[row + 1]) ||
+                    _arrArrange[row + 1] == 0)
                 {
-                    long sum = arrEqual.Where((c, i) => i >= row).Sum(b => b);
+                    sum = 0;
+                    for (int i = row; i < _arrArrange.Length; i++)
+                        sum += _arrArrange[i];
 
-                    if (!Arrange(row, arrEqual[row] - 1, sum))
-                    {
+                    if (!Arrange(row, _arrArrange[row] - 1, sum))
                         break;
-                    }
 
-                    process?.Invoke(arrEqual);
+                    if (_process is not null)
+                    {
+                        for (int i = 0; i < _arrArrange.Length; i++)
+                            _arrEqual[i] = (char)(_arrArrange[i] + _minNumber);
+
+                        _process.Invoke(_arrEqual);
+                    }
                 }
 
                 backWard++;
 
                 Shift(row + 1);
             }
-            while (arrEqual[row] > arrEqual[row + 1]);
+            while (_arrArrange[row] > _arrArrange[row + 1]);
         }
 
         private bool Arrange(int row, int maxNumber, long sum)
@@ -67,20 +79,19 @@
             int fullRows = (int)(sum / maxNumber);
             int mod = (int)(sum % maxNumber);
 
-            if (row + fullRows + (mod > 0 ? 1 : 0) > arrEqual.Length)
-            {
+            if (row + fullRows + (mod > 0 ? 1 : 0) > _arrArrange.Length)
                 return false;
-            }
 
-            Array.Fill(arrEqual, (char)maxNumber, row, fullRows);
+            int pos = row;
+            for (; pos < row + fullRows; pos++)
+                _arrArrange[pos] = (char)maxNumber;
 
-            int pos = row + fullRows;
-            if (pos < arrEqual.Length)
+            if (pos < _arrArrange.Length)
             {
-                arrEqual[pos++] = (char)mod;
+                _arrArrange[pos++] = (char)mod;
 
-                if (pos < arrEqual.Length)
-                    Array.Fill(arrEqual, (char)0, pos, arrEqual.Length - pos);
+                for (; pos < _arrArrange.Length; pos++)
+                    _arrArrange[pos] = (char)0;
             }
 
             return true;

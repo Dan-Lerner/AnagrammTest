@@ -17,16 +17,16 @@ for (int i = 0; i < 1000; i++)
 {
     random = GenerateString(sample);
 
-    // Nonlinear anagramm check
+    // Nonlinear algorythm check
     sw = Stopwatch.StartNew();
-    //anagramm.IsAnagrammNonlinear(random);
-    Anagramm.IsAnagrammNonlinearUnsafe(sample, random);
+    anagramm.IsAnagrammNonlinear(random);
+    //Anagramm.IsAnagrammNonlinearUnsafe(sample, random);
     //Anagramm.IsAnagrammLINQ(sample, random);
     sw.Stop();
     // Average nonlinear time
     timeNL = (timeNL * i + sw.Elapsed.Ticks) / (i + 1);
 
-    // Classic anagramm check
+    // Classic algorythm check
     sw = Stopwatch.StartNew();
     isAnagramm = anagramm.IsAnagrammClassic(random);
     sw.Stop();
@@ -39,8 +39,8 @@ for (int i = 0; i < 1000; i++)
     }
 }
 
-Console.WriteLine("Classic anagramm detection avg time = {0}", timeClassic);
-Console.WriteLine("Nonlinear anagramm detection avg time = {0}", timeNL);
+Console.WriteLine("Classic anagramm detection avg time = {0:f02}", timeClassic);
+Console.WriteLine("Nonlinear anagramm detection avg time = {0:f02}", timeNL);
 
 /// <summary>
 /// This method generates a string of the same Length as the samlpe

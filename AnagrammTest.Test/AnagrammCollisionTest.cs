@@ -42,11 +42,12 @@ namespace AnagrammTest.Test
             // It depends on strTest.Length and max CodeValue
 
             // Arrange
-            string strTest = "abcdefjk";
-            char maxCodeValue = (char)125;
+            string strTest = "abcdefghijklmno";
+            char maxCodeValue = 'w';
+            char minCodeValue = 'a';
 
             var anagramm = new Anagramm(strTest);
-            var testEqual = new FindEqualSumStrings(strTest, maxCodeValue);
+            var testEqual = new FindEqualSumStrings(strTest, maxCodeValue, minCodeValue);
 
             int collisions = 0;
             string strEqual;
